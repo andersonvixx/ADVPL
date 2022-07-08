@@ -1,0 +1,317 @@
+#Include "PROTHEUS.CH"
+#Include "RWMAKE.CH"
+#Include "TOPCONN.CH"
+#DEFINE ENTER CHR(13)+CHR(10)
+User Function fRelRat()
+
+Local cQryCC
+
+#IfDef TOP    // Base de dados SQL.
+
+	cQryCC := "SELECT D1_CC, CTT_DESC01,D1_TOTAL,E2_TOTAL, E2_EMISSAO, E2_VENCREA, " + ENTER
+	cQryCC += "       E2_NOMFOR, E2_NATUREZ, ED_DESCRIC, E2_PREFIXO, E2_NUM, E2_PARCELA, E2_TIPO " + ENTER
+	cQryCC += "FROM SD1010 SD1, SE2010 SE2, SED010 SED, CTT010 CTT " + ENTER
+	cQryCC += "WHERE D1_DOC = E2_NUM AND D1_SERIE = E2_PREFIXO AND " + ENTER
+	cQryCC += "      D1_LOJA = E2_LOJA AND  D1_FORNECE = E2_FORNECE AND " + ENTER
+	cQryCC += "      E2_ORIGEM = 'MATA100' AND " + ENTER
+	cQryCC += "      CTT_CUSTO = D1_CC AND " + ENTER
+	cQryCC += "      ED_CODIGO = E2_NATUREZ " + ENTER
+	cQryCC += "      SD1.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      SE2.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      SED.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      CTT.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      CTT_CUSTO BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"' AND " + ENTER
+	cQryCC += "      ED_CODIGO BETWEEN '"+MV_PAR03+"' AND '"+MV_PAR04+"' AND " + ENTER
+	cQryCC += "      E2_VENCREA BETWEEN '"+DTOS(MV_PAR05)+"' AND '"+DTOS(MV_PAR06)+"' " + ENTER
+	cQryCC += "UNION ALL " + ENTER
+	cQryCC += "SELECT EZ_CCUSTO, CTT_DESC01,EZ_VALOR,E2_VALOR, E2_EMISSAO, E2_VENCREA, " + ENTER
+	cQryCC += "       E2_NOMFOR, EZ_NATUREZ, ED_DESCRIC, E2_PREFIXO, E2_NUM, E2_PARCELA, E2_TIPO  " + ENTER
+	cQryCC += "FROM SEZ010 SEZ, SE2010 SE2, SED010 SED, CTT010 CTT " + ENTER
+	cQryCC += "WHERE EZ_NUM = E2_NUM AND EZ_PREFIXO = E2_PREFIXO AND EZ_CLIFOR = E2_FORNECE AND " + ENTER
+	cQryCC += "      EZ_LOJA = E2_LOJA AND E2_PARCELA = EZ_PARCELA AND " + ENTER
+	cQryCC += "      E2_ORIGEM LIKE 'FIN%' AND " + ENTER
+	cQryCC += "      CTT_CUSTO = EZ_CCUSTO AND " + ENTER
+	cQryCC += "      ED_CODIGO = EZ_NATUREZ AND " + ENTER
+	cQryCC += "      SEZ.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      SE2.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      SED.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      CTT.D_E_L_E_T_ = '' " + ENTER
+	cQryCC += "      CTT_CUSTO BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"' AND " + ENTER
+	cQryCC += "      ED_CODIGO BETWEEN '"+MV_PAR03+"' AND '"+MV_PAR04+"' AND " + ENTER
+	cQryCC += "      E2_VENCREA BETWEEN '"+DTOS(MV_PAR05)+"' AND '"+DTOS(MV_PAR06)+"' " + ENTER
+	cQryCC += "UNION ALL " + ENTER
+	cQryCC += "SELECT E2_CCD, CTT_DESC01,E2_VALOR,E2_VALOR, E2_EMISSAO, E2_VENCREA, " + ENTER
+	cQryCC += "       E2_NOMFOR, E2_NATUREZ, ED_DESCRIC, E2_PREFIXO, E2_NUM, E2_PARCELA, E2_TIPO  " + ENTER
+	cQryCC += "FROM SE2010 SE2, SED010 SED, CTT010 CTT " + ENTER
+	cQryCC += "WHERE E2_ORIGEM LIKE 'FIN%' AND " + ENTER
+	cQryCC += "      CTT_CUSTO = E2_CCD AND " + ENTER
+	cQryCC += "      ED_CODIGO = E2_NATUREZ AND " + ENTER
+	cQryCC += "      SE2.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      SED.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      CTT.D_E_L_E_T_ = '' AND " + ENTER
+	cQryCC += "      CTT_CUSTO BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"' AND " + ENTER
+	cQryCC += "      ED_CODIGO BETWEEN '"+MV_PAR03+"' AND '"+MV_PAR04+"' AND " + ENTER
+	cQryCC += "      E2_VENCREA BETWEEN '"+DTOS(MV_PAR05)+"' AND '"+DTOS(MV_PAR06)+"' AND " + ENTER
+	cQryCC += "      NOT EXISTS ( SELECT * FROM SEZ010 SEZ " + ENTER
+	cQryCC += "                   WHERE EZ_NUM = E2_NUM AND EZ_PREFIXO = E2_PREFIXO AND " + ENTER 
+	cQryCC += "                         EZ_CLIFOR = E2_FORNECE AND EZ_LOJA = E2_LOJA AND " + ENTER
+	cQryCC += "                         SEZ.D_E_L_E_T_ = '' AND E2_PARCELA = EZ_PARCELA) " + ENTER
+		
+   CHANGEQUERY(CqUERY)
+   TCQuery cQuery Alias MOVIM New //Via "TOPCONN"
+
+   // Converte os campos de Data e Valor para os tipos corretos definidos no SX3.
+   TCSetField("QRYCC", "D1_TOTAL", "D")
+   TCSetField("QRYCC", "E2_TOTAL", "D")
+   TCSetField("QRYCC", "E2_EMISSAO", "N", 12, 2)
+   TCSetField("QRYCC", "E2_VENCREA", "N", 12, 2)
+
+   dbSelectArea("MOVIM")
+   While !MOVIM->(Eof())
+      MsgAlert(MOVIM->Z2_Nome + " " + MOVIM->Z2_Tipo + " " + DtoC(MOVIM->Z2_Data) + " " + Str(MOVIM->Z2_Valor))
+      MOVIM->(dbSkip())
+   End
+
+   dbSelectArea("MOVIM")
+   dbCloseArea()
+
+ #Else        // Base de dados DBF ou CTree.
+
+   dbSelectArea("SZ2")
+   cArqInd := CriaTrab(Nil, .F.)                                  // Nome do arq.temporario.
+   cChave  := "xFilial('SZ2') + Z2_Nome + DtoS(Z2_Data)"          // Chave de indexacao.
+   cFiltro := "Z2_Filial == xFilial('SZ2') .And. Z2_Tipo == 'S'"  // Filtro.
+   cOrdem  := " "                                                 // "D" = decrescente.
+   lMostra := .T.                                                 // Mostrar a regua de progressao.
+
+   // Cria um indice temporario ja filtrado.
+   IndRegua("SZ2", cArqInd, cChave, cOrdem, cFiltro, "Indexando...", lMostra)
+
+	   While !SZ2->(Eof())
+      MsgAlert(SZ2->Z2_Nome + " " + SZ2->Z2_Tipo + " " + DtoC(SZ2->Z2_Data) + " " + Str(SZ2->Z2_Valor))
+      SZ2->(dbSkip())
+   End
+
+   RetIndex("SZ2")                // Reativa os indices originais que foram desativados pelo IndRegua().
+
+   FErase(cArqInd + OrdBagExt())  // Deleta o arq. criado para liberar espaco em disco.
+
+#EndIf
+
+Return
+
+//----------------------------------------------------------------------------//
+// Demostracao de acesso direto à base de dados.
+// Em bases de dados SQL, o acesso a um unico registro é executado tambem por
+// meio de uma query, enquanto que em arquivos DBF é pelo comando dbSeek(), que
+// posiciona direto no registro, pela chave.
+//----------------------------------------------------------------------------//
+User Function DBFSQL2()
+
+Local oDlg
+Local cNome := Space(Len(SZ1->Z1_Nome))
+Local oSaldo
+Local nSaldo := 0
+
+Define MSDialog oDlg Title "Acesso à Base Dados" From 0,0 To 200,250 Pixel
+
+@30,10 Say "Nome:" Pixel Of oDlg
+@30,50 MSGet oNome Var cNome Picture "@!" Size 50,10 Pixel F3 "SZ1" Valid u_VeSaldo(cNome, oSaldo, @nSaldo) Of oDlg
+
+@50,10 Say "Saldo:" Pixel Of oDlg
+@50,50 Get oSaldo Var nSaldo Picture "@E 999,999,999.99" Size 50,10 Pixel Of oDlg
+
+Activate MSDialog oDlg Centered
+
+Return
+
+//----------------------------------------------------------------------------//
+User Function VeSaldo(cNome, oSaldo, nSaldo)
+
+Local cQuery
+
+#IfDef TOP    // Base de dados SQL.
+
+   // Define a query. A funcao RetSqlName() retorna o nome fisico do arquivo: SZ2990
+   cQuery := "SELECT Z1_SALDO FROM " + RetSqlName("SZ1") + " "
+   cQuery += "WHERE Z1_FILIAL = '" + xFilial("SZ1") + "' AND Z1_NOME = '" + cNome + "' AND D_E_L_E_T_ <> '*'"
+   
+   // Executa a query e retorna uma WorkArea denominada MOVIM, contendo os registros
+   // filtrados pela clausula WHERE.
+   TCQuery cQuery Alias SALDO New
+
+   // Converte os campos para os tipos corretos definidos no SX3.
+   TCSetField("SALDO", "Z1_Saldo", "N", 12, 2)
+   
+   dbSelectArea("SALDO")
+
+   nSaldo := SALDO->Z1_Saldo
+
+   // Fecha a WorkArea criada pela query.
+   dbSelectArea("SALDO")
+   dbCloseArea()
+
+ #Else        // Base de dados DBF ou CTree.
+
+   dbSelectArea("SZ1")
+   dbOrderNickName("NOME")
+   dbSeek(xFilial("SZ1") + cNome)
+   nSaldo := SZ1->Z1_Saldo
+
+#EndIf
+
+// Atualiza o conteudo do campo de saldo na tela.
+oSaldo:SetText(nSaldo)
+oSaldo:Refresh()
+
+Return .T.
+
+//----------------------------------------------------------------------------//
+// Demonstracao de atualizacao (UPDATE) da base de dados.
+//----------------------------------------------------------------------------//
+User Function DBFSQL3()
+
+Local oDlg, oBtnOk, oBtnCancel
+Local nPct := 0
+
+Define MSDialog oDlg Title "Atualização da Base Dados" From 0,0 To 200,450 Pixel
+
+@50,010 Say "% Limite de cheque-especial:" Pixel Of oDlg
+@50,150 Get nPct Size 50,10 Picture "@E 999" Pixel Of oDlg
+
+@oDlg:nHeight/2-30,oDlg:nClientWidth/2-70 Button oBtnOk     Prompt "&Ok"       Size 30,15 Pixel Action u_Calcula(nPct) Of oDlg
+@oDlg:nHeight/2-30,oDlg:nClientWidth/2-35 Button oBtnCancel Prompt "&Cancelar" Size 30,15 Pixel Action oDlg:End()      Of oDlg
+
+Activate MSDialog oDlg Centered
+
+Return
+
+//----------------------------------------------------------------------------//
+User Function Calcula(nPct)
+
+#IfDef TOP
+
+   TCSQLExec("UPDATE SZ1990 SET Z1_LIMITE = Z1_SALDO * " + Str((1+(nPct/100))))
+
+ #Else
+
+   dbSelectArea("SZ1")
+   dbOrderNickName("NOME")
+   dbGoTop()
+
+   While !SZ1->(Eof())
+
+      RecLock("SZ1")
+      SZ1->Z1_Limite := SZ1->Z1_Saldo * (1+(nPct/100))
+      MSUnlock()
+      SZ1->(dbSkip())
+
+   End
+
+#EndIf
+
+MsgAlert("OK")
+
+Return
+
+//----------------------------------------------------------------------------//
+// Demostracao de campos agregados.
+//----------------------------------------------------------------------------//
+User Function DBFSQL4()
+
+Local cQuery
+
+#IfDef TOP    // Base de dados SQL.
+
+   // Define a query. A funcao RetSqlName() retorna o nome fisico do arquivo: SZ2990
+   cQuery := "SELECT Z2_NUMERO, Z2_VALOR, Z2_VALOR*2 AS VALOR2, Z2_VALOR*3 AS VALOR3 FROM " + RetSqlName("SZ2") + " "
+   cQuery += "WHERE Z2_FILIAL = '" + xFilial("SZ2") + "' AND D_E_L_E_T_ <> '*'"
+
+   // Executa a query e retorna uma WorkArea denominada MOVIM, contendo os registros
+   // filtrados pela clausula WHERE.
+   TCQuery cQuery Alias MOVIM New //Via "TOPCONN"
+
+   dbSelectArea("MOVIM")
+   While !MOVIM->(Eof())
+      // Colunas agregadas: caso nao seja especificado um alias para as colunas agregadas, recebem o nome de cFieldN,
+      // onde N é a posicao da coluna dentro da query.
+      // MsgAlert(MOVIM->Z2_Numero + " " + Str(MOVIM->Z2_Valor) + " " + Str(MOVIM->cField3) + " " + Str(MOVIM->cField4))
+      MsgAlert(MOVIM->Z2_Numero + " " + Str(MOVIM->Z2_Valor) + " " + Str(MOVIM->Valor2) + " " + Str(MOVIM->Valor3))
+      MOVIM->(dbSkip())
+   End
+
+#EndIf
+
+Return
+
+//----------------------------------------------------------------------------//
+// Demostracao do PACK - exclusao dos registros deletados.
+//----------------------------------------------------------------------------//
+User Function DBFSQL5()
+
+#IfDef TOP
+
+   TCSQLExec("DELETE " + RetSqlName("SZ2") + " WHERE D_E_L_E_T_ = '*'")
+
+   MsgAlert("OK: SQL/DELETE")
+
+ #Else
+
+   AbreExcl("SZ2")
+   Pack
+
+   MsgAlert("OK: DBF/PACK")
+
+#EndIf
+
+Return
+
+//----------------------------------------------------------------------------//
+// Demonstracao do Embedded SQL, que permite escrever diretamente os comandos
+// SQL, sem a necessidade de montar uma string e executar via TCQuery.
+//----------------------------------------------------------------------------//
+User Function DBFSQL6()
+
+/* Modelo usando string e TCQuery:
+
+cQuery := "SELECT * FROM " + RetSqlName("SZ2") + " "
+cQuery += "WHERE Z2_FILIAL = '" + xFilial("SZ2") + "' AND Z2_TIPO = 'S' AND D_E_L_E_T_ <> '*' "
+cQuery += "ORDER BY Z2_NOME, Z2_DATA"
+
+TCQuery cQuery Alias MOVIM New //Via "TOPCONN"
+
+TCSetField("MOVIM", "Z2_DATA", "D")
+TCSetField("MOVIM", "Z2_VALOR", "N", 12, 2)
+
+*/
+
+#IfDef TOP    // Base de dados SQL.
+
+   // Modelo usando Embedded SQL:
+
+   BeginSQL Alias "MOVIM"
+
+      Column Z2_DATA  As Date
+      Column Z2_VALOR As Numeric(12,2)
+
+      %NoParser%
+
+      SELECT SZ2.Z2_NOME, SZ2.Z2_TIPO, SZ2.Z2_DATA, SZ2.Z2_VALOR
+      FROM %Table:SZ2% SZ2
+      WHERE SZ2.Z2_FILIAL = %xFilial:SZ2% AND SZ2.Z2_TIPO = "S" AND SZ2.%NotDel%
+      ORDER BY %Order:SZ2,1%
+
+   EndSQL
+
+   dbSelectArea("MOVIM")
+   While !MOVIM->(Eof())
+      MsgAlert(MOVIM->Z2_Nome + " " + MOVIM->Z2_Tipo + " " + DtoC(MOVIM->Z2_Data) + " " + Str(MOVIM->Z2_Valor,12,2))
+      MOVIM->(dbSkip())
+   End
+
+   dbSelectArea("MOVIM")
+   dbCloseArea()
+
+#EndIf
+
+Return

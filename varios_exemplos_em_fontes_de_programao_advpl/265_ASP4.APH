@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>AdvPL/ASP</title>
+<body>
+
+<p>Data: <%=HttpSession->dData%></p>
+<p>Hora: <%=HttpSession->cHora%></p>
+<p></p>
+
+<!--
+     Exercicio 1:
+       Faça um loop para mostrar os dias da semana.
+     Exercicio 2:
+       No dia da semana de dData, mostre '<===== Hoje'.
+ -->
+
+<!--<p> <%=HttpSession->i%> </p>-->
+
+</body>
+</html>

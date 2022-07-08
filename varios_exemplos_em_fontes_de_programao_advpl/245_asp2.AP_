@@ -1,0 +1,28 @@
+#include "SIGAWIN.CH"
+#define CRLF CHR(13)+CHR(10)
+
+HTML Function 245_asp2(__aCookies,__aPostParms,__nProcId,__aProcParms,__cHTTPPage)
+Local __Response := ""
+
+__Response += PlainH_1()
+
+Return(__Response)
+
+Static Function PlainH_1()
+Local __Response := ""
+
+__Response += '<html>' + CRLF
+__Response += '<head>' + CRLF
+__Response += '<title>AdvPL/ASP</title>' + CRLF
+__Response += '<body>' + CRLF
+__Response += '' + CRLF
+__Response += 'Exemplo AdvPL/ASP - metodo POST' + CRLF
+__Response += '' + CRLF
+__Response += '<form name="form1" action="u_ASP2.apw" method="post">' + CRLF
+__Response += 'Campo 1: <input type="text" name="Campo1"><br>' + CRLF
+__Response += '<input type="submit" value="Enviar">' + CRLF
+__Response += '</form>' + CRLF
+__Response += '' + CRLF
+__Response += '</body>' + CRLF
+__Response += '</html>' + CRLF
+Return(__Response)

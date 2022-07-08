@@ -1,0 +1,46 @@
+#include "SIGAWIN.CH"
+#define CRLF CHR(13)+CHR(10)
+
+HTML Function 265_asp4(__aCookies,__aPostParms,__nProcId,__aProcParms,__cHTTPPage)
+Local __Response := ""
+
+__Response += PlainH_1()
+__Response += '<p>Data: ' + cValToChar(HttpSession->dData) + '</p>' + CRLF
+__Response += '<p>Hora: ' + cValToChar(HttpSession->cHora) + '</p>' + CRLF
+__Response += PlainH_2()
+__Response += '<!--<p> ' + cValToChar(HttpSession->i) + ' </p>-->' + CRLF
+__Response += PlainH_3()
+
+Return(__Response)
+
+Static Function PlainH_1()
+Local __Response := ""
+
+__Response += '<html>' + CRLF
+__Response += '<head>' + CRLF
+__Response += '<title>AdvPL/ASP</title>' + CRLF
+__Response += '<body>' + CRLF
+__Response += '' + CRLF
+Return(__Response)
+
+Static Function PlainH_2()
+Local __Response := ""
+
+__Response += '<p></p>' + CRLF
+__Response += '' + CRLF
+__Response += '<!--' + CRLF
+__Response += '     Exercicio 1:' + CRLF
+__Response += '       Faça um loop para mostrar os dias da semana.' + CRLF
+__Response += '     Exercicio 2:' + CRLF
+__Response += "       No dia da semana de dData, mostre '<===== Hoje'." + CRLF
+__Response += ' -->' + CRLF
+__Response += '' + CRLF
+Return(__Response)
+
+Static Function PlainH_3()
+Local __Response := ""
+
+__Response += '' + CRLF
+__Response += '</body>' + CRLF
+__Response += '</html>' + CRLF
+Return(__Response)

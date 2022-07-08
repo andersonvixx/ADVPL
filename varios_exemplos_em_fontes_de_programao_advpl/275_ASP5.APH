@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>AdvPL/ASP</title>
+<body>
+
+<strong>
+  <font size="5" face="Verdana, Arial, Helvetica, sans-serif">
+    Inclus&atilde;o de Transação                                       <!-- // Titulo da tela -->
+  </font>
+</strong>
+
+<form name="form1" action="u_ASP5Grava.apw" method="post">
+
+  <table width="0" border="0" cellspacing="0" cellpadding="0">         <!-- // Cria uma tabela -->
+
+    <!-- // Campo Nome: inclui num combo-box os nomes contidos no SZ1 -->
+
+    <tr>                                                               <!-- // Inclui uma linha na tabela -->
+
+      <td width="130" height="40">                                     <!-- // Inclui uma celula na linha para o titulo do campo -->
+        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+          Nome:
+        </font>
+      </td>
+
+      <td width="300">                                                 <!-- // Inclui outra celula para o campo -->
+
+        <select name="cboNome" id="cboNome">                           <!-- // Cria o combo-box -->
+
+          <option>                                                     <!-- // Inclui a primeira opcao no combo-box -->
+            Selecione um nome
+          </option>
+
+          <%dbSelectArea("SZ1")%>                                      <!-- // Le o arq. SZ1 e inclui os nomes no combo-box -->
+          <%dbSeek(xFilial("SZ1"))%>
+          <%While SZ1->Z1_Filial == xFilial("SZ1") .And. !SZ1->(Eof())%>
+               <option>
+                 <%=SZ1->Z1_Nome%>
+               </option>
+               <%SZ1->(dbSkip())%>
+          <%End%>
+
+        </select>
+
+      </td>
+
+    </tr>
+
+    <!-- // Campo Data -->
+
+    <tr> 
+      <td width="130" height="40"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Data (dd/mm/aa):</font></td>
+      <td width="300">
+        <input name="Data" type="text" id="Data2">
+      </td>
+    </tr>
+
+    <!-- // Campo Tipo -->
+
+    <tr> 
+      <td width="130" height="40"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Tipo:</font></td>
+      <td width="300"> 
+        <p> 
+          <input name="Tipo" type="radio" value="D" checked>
+          <font size="2" face="Verdana, Arial, Helvetica, sans-serif">Dep&oacute;sito</font>
+          <input type="radio" name="Tipo" value="S">
+          <font size="2" face="Verdana, Arial, Helvetica, sans-serif">Saque</font>
+        </p>
+      </td>
+    </tr>
+
+    <!-- // Campo Historico -->
+
+    <tr> 
+      <td width="130" height="40"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Hist&oacute;rico:</font></td>
+      <td width="300">
+        <input name="Hist" type="text" id="Hist2">
+      </td>
+    </tr>
+
+    <!-- // Campo Valor -->
+
+    <tr> 
+      <td width="130" height="40"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Valor:</font></td>
+      <td width="300">
+        <input name="Valor" type="text" id="Valor2">
+      </td>
+    </tr>
+
+  </table>
+
+  <p>
+    <input type="submit" value="Enviar">                               <!-- // Botao Enviar -->
+  </p>
+
+</form>
+
+</body>
+</html>
